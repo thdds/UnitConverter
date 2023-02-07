@@ -10,19 +10,33 @@ import SwiftUI
 struct ContentView: View {
     @FocusState private var inputTempIsFocused: Bool
     @State private var inputTemperatur = 0.0
+    private var test = Measurement(value: 0, unit: UnitTemperature.celsius)
     private var convertedValue: Double {
         if inputTempType == "ºC" {
             if outputTemperaturType == "F" {
                 return inputTemperatur * 1.8 + 32
             } else if outputTemperaturType == "K" {
-                return inputTemperatur - 270.0
+                return inputTemperatur + 273.15
             } else {
                 return inputTemperatur
             }
-        } else {
-            return inputTemperatur
+        } else if inputTempType == "F" {
+            if outputTemperaturType == "ºC" {
+                return (inputTemperatur-32) * (5/9)
+            } else if outputTemperaturType == "K" {
+                return (inputTemperatur - 32) / 1.8 + 273.15
+            } else {
+                return inputTemperatur
+            }
+        } else { // Kelvin
+            if outputTemperaturType == "ºC" {
+                return inputTemperatur - 273.15
+            } else if outputTemperaturType == "F" {
+                return (inputTemperatur - 273.15) * 1.8 + 32
+            } else {
+                return inputTemperatur
+            }
         }
-        
     }
     @State private var outputTemperaturType = "F"
     @State private var inputTempType:String = "ºC"
@@ -51,15 +65,16 @@ struct ContentView: View {
                     Text("Choose your output Temperatur")
                 }
                 Section {
-                    Text((convertedValue), format: .number)
+                    Text(convertedValue, format: .number)
                 } header: {
                     Text("Output Temperatur")
                 }
-            }.navigationTitle("Temperatur Converter")
+            }
+                .navigationTitle("Temperatur Converter")
                 .toolbar {
                     ToolbarItemGroup(placement: .keyboard) {
                         Spacer()
-                        
+
                         Button("Done") {
                             inputTempIsFocused = false
                         }
